@@ -148,3 +148,18 @@ Dshell> decode -d netflow ~/pcap/vlan.cap
 1999-11-05 18:20:40.112031      131.151.5.55 ->    131.151.5.255  (US -> US)  UDP     138     138     1      0      201        0  0.0000s
 1999-11-05 18:20:43.183825     131.151.32.79 ->   131.151.32.255  (US -> US)  UDP     138     138     1      0      201        0  0.0000s
 ```
+
+Collecting executable files from [sample traffic](https://github.com/abzcoding/Dshell/raw/master/examples/baracuda.pcap) 
+
+```bash
+cd run
+./../dshell
+Dshell> decode -q -d web-exe ../examples/baracuda.pcap 
+web-exe 2013-10-22 22:58:02    192.168.40.10:1048  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html (144.76.192.102/?9de26ff3b66ba82b35e31bf4ea975dfe) **
+web-exe 2013-10-22 22:58:25    192.168.40.10:1049  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html_ (144.76.192.102/?90f5b9a1fbcb2e4a879001a28d7940b4) **
+web-exe 2013-10-22 22:58:35    192.168.40.10:1051  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html__ (144.76.192.102/?35523bb81eca604f9ebd1748879f3fc1) **
+web-exe 2013-10-22 22:58:36    192.168.40.10:1052  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html___ (144.76.192.102/?b28b06f01e219d58efba9fe0d1fe1bb3) **
+web-exe 2013-10-22 22:58:43    192.168.40.10:1069  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html____ (144.76.192.102/?52d4e644e9cda518824293e7a4cdb7a1) **
+Dshell> file ./144.76.192.102-192.168.40.10_index.html____
+./144.76.192.102-192.168.40.10_index.html____: PE32 executable (console) Intel 80386, for MS Windows
+```
