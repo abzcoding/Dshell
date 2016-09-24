@@ -23,18 +23,17 @@ Key features:
 * [elasticsearch-py](https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/index.html), Apache License, Version 2.0 - optional, used only with Dshell's elasticout output module
 
 ## Installation
+1. Install all of the necessary Python modules listed above.
+```bash
+sudo su
+apt-get install python-crypto python-dpkt python-ipy python-pypcap
+pip install pygeoip
+git clone https://github.com/abzcoding/Dshell.git /opt/dshell
+cd /opt/dshell
+make
+```
 
-1. Install all of the necessary Python modules listed above. Many of them are available via pip and/or apt-get. Pygeoip is not yet available as a package and must be installed with pip or manually.
-
-  1. `sudo apt-get install python-crypto python-dpkt python-ipy python-pypcap`
-
-  2. `sudo pip install pygeoip`
-
-2. Configure pygeoip by moving the MaxMind data files (GeoIP.dat, GeoIPv6.dat, GeoIPASNum.dat, GeoIPASNumv6.dat) to &lt;install-location&gt;/share/GeoIP/
-
-2. Run `make`. This will build Dshell.
-
-3. Run `./dshell`. This is Dshell. If you get a Dshell> prompt, you're good to go!
+2. Run `./dshell`. This is Dshell. If you get a Dshell> prompt, you're good to go!
 
 ## Basic usage
 
@@ -47,14 +46,22 @@ Key features:
 * `decode -d <decoder> <pcap>`
   * Run the selected decoder on a pcap file
 
-## Partners
-
-Below are repositories from partners Dshell has worked together with.
-
-* [DeKrych/Dshell-plugins](https://github.com/DeKrych/Dshell-plugins)
-* [terry-wen/Network-Visualization-Project](https://github.com/terry-wen/Network-Visualization-Project)
-
 ## Usage Examples
+
+Collecting executable files from [sample traffic](https://github.com/abzcoding/Dshell/raw/master/examples/baracuda.pcap) 
+
+```bash
+cd /opt/dshell/run
+./../dshell
+Dshell> decode -q -d web-exe ../examples/baracuda.pcap 
+web-exe 2013-10-22 22:58:02    192.168.40.10:1048  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html (144.76.192.102/?9de26ff3b66ba82b35e31bf4ea975dfe) **
+web-exe 2013-10-22 22:58:25    192.168.40.10:1049  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html_ (144.76.192.102/?90f5b9a1fbcb2e4a879001a28d7940b4) **
+web-exe 2013-10-22 22:58:35    192.168.40.10:1051  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html__ (144.76.192.102/?35523bb81eca604f9ebd1748879f3fc1) **
+web-exe 2013-10-22 22:58:36    192.168.40.10:1052  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html___ (144.76.192.102/?b28b06f01e219d58efba9fe0d1fe1bb3) **
+web-exe 2013-10-22 22:58:43    192.168.40.10:1069  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html____ (144.76.192.102/?52d4e644e9cda518824293e7a4cdb7a1) **
+Dshell> file ./144.76.192.102-192.168.40.10_index.html____
+./144.76.192.102-192.168.40.10_index.html____: PE32 executable (console) Intel 80386, for MS Windows
+```
 
 Showing DNS lookups in [sample traffic](http://wiki.wireshark.org/SampleCaptures#General_.2F_Unsorted)
 
@@ -147,19 +154,4 @@ Dshell> decode -d netflow ~/pcap/vlan.cap
 1999-11-05 18:20:43.363348   131.151.107.254 ->  255.255.255.255  (US -> --)  UDP     520     520     1      0       24        0  0.0000s
 1999-11-05 18:20:40.112031      131.151.5.55 ->    131.151.5.255  (US -> US)  UDP     138     138     1      0      201        0  0.0000s
 1999-11-05 18:20:43.183825     131.151.32.79 ->   131.151.32.255  (US -> US)  UDP     138     138     1      0      201        0  0.0000s
-```
-
-Collecting executable files from [sample traffic](https://github.com/abzcoding/Dshell/raw/master/examples/baracuda.pcap) 
-
-```bash
-cd run
-./../dshell
-Dshell> decode -q -d web-exe ../examples/baracuda.pcap 
-web-exe 2013-10-22 22:58:02    192.168.40.10:1048  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html (144.76.192.102/?9de26ff3b66ba82b35e31bf4ea975dfe) **
-web-exe 2013-10-22 22:58:25    192.168.40.10:1049  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html_ (144.76.192.102/?90f5b9a1fbcb2e4a879001a28d7940b4) **
-web-exe 2013-10-22 22:58:35    192.168.40.10:1051  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html__ (144.76.192.102/?35523bb81eca604f9ebd1748879f3fc1) **
-web-exe 2013-10-22 22:58:36    192.168.40.10:1052  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html___ (144.76.192.102/?b28b06f01e219d58efba9fe0d1fe1bb3) **
-web-exe 2013-10-22 22:58:43    192.168.40.10:1069  <-   144.76.192.102:80    ** File done: ./144.76.192.102-192.168.40.10_index.html____ (144.76.192.102/?52d4e644e9cda518824293e7a4cdb7a1) **
-Dshell> file ./144.76.192.102-192.168.40.10_index.html____
-./144.76.192.102-192.168.40.10_index.html____: PE32 executable (console) Intel 80386, for MS Windows
 ```
