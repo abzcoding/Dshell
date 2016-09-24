@@ -45,6 +45,8 @@ make
   * Display information about a decoder, including available command-line flags
 * `decode -d <decoder> <pcap>`
   * Run the selected decoder on a pcap file
+* `decode -d <decoder> -i <interface>`
+  * Listen Live on the given interface and run the decoder ( will not finish until you hit ctrl+c )
 
 ## Usage Examples
 
