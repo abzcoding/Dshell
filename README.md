@@ -63,6 +63,27 @@ Dshell> file ./144.76.192.102-192.168.40.10_index.html____
 ./144.76.192.102-192.168.40.10_index.html____: PE32 executable (console) Intel 80386, for MS Windows
 ```
 
+Live Executable File Capture from network interface ( in this case ens33 )
+```bash
+sudo su
+cd /opt/dshell/run
+ifconfig ens33
+ens33     Link encap:Ethernet  HWaddr 00:50:56:31:26:7a  
+          inet addr:172.17.193.12  Bcast:172.17.193.255  Mask:255.255.255.0
+          inet6 addr: fe80::250:56ff:fe31:267a/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:745574 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1040657 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:471830876 (471.8 MB)  TX bytes:2062137094 (2.0 GB)
+
+./../dshell
+Dshell> decode -d web-exe -i ens33 # this will listen on ens33 interface for executable files
+web-exe 2016-09-24 19:20:54   172.17.193.12:50546 <-   152.19.134.46:80  ** File done: ./md5sum.exe (www.etree.orghttp://www.etree.org/cgi-bin/counter.cgi/software/md5sum.exe) ** ^C
+Dshell> file md5sum.exe
+md5sum.exe: PE32 executable (console) Intel 80386, for MS Windows
+```
+
 Showing DNS lookups in [sample traffic](http://wiki.wireshark.org/SampleCaptures#General_.2F_Unsorted)
 
 ```
