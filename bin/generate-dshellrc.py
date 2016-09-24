@@ -33,7 +33,7 @@ if __name__ == '__main__':
     envdict.update(envsetup)
 
     #.dshellrc text
-    env = ['export PS1="`whoami`@`hostname`:\w Dshell> "'] + ['export %s=%s' %
+    env = ['export PS1="[\W\[$(tput sgr0)\]]: Dshell> "'] + ['export %s=%s' %
                                                               (k, v) for k, v in envvars.items()] + ['export %s=%s' % (k, v) for k, v in envsetup.items()]
     outfd = open('.dshellrc', 'w')
     outfd.write("\n".join(env))
