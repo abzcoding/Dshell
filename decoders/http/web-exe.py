@@ -25,7 +25,7 @@ def clean_files(exe_files):
                 item = item.split("/")[1]
             if CleanUp == item:
                 delete = False
-        if delete:
+        if delete and CleanUp != ".keep":
             os.remove(CleanUp)
 
 
