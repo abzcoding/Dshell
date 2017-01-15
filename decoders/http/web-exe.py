@@ -14,20 +14,6 @@ import glob
 # we extend this
 from httpdecoder import HTTPDecoder
 
-exe_files = []
-
-
-def clean_files(exe_files):
-    for CleanUp in glob.glob('*'):
-        delete = True
-        for item in exe_files:
-            if item.startswith("./"):
-                item = item.split("/")[1]
-            if CleanUp == item:
-                delete = False
-        if delete and CleanUp != ".keep":
-            os.remove(CleanUp)
-
 
 class DshellDecoder(HTTPDecoder):
 
@@ -65,6 +51,13 @@ class DshellDecoder(HTTPDecoder):
     def splitstrip(self, data, sep, strip=' '):
         return [lpart.strip(strip) for lpart in data.split(sep)]
 
+    def md5(self, fname):
+        hash_md5 = hashlib.md5()
+        with open(fname, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                hash_md5.update(chunk)
+        return hash_md5.hexdigest()
+
     def HTTPHandler(self, conn, request, response, requesttime, responsetime):
         payload = None
         self.debug('%s %s' % (repr(request), repr(response)))
@@ -85,7 +78,7 @@ class DshellDecoder(HTTPDecoder):
             if url in self.openfiles:
                 self.debug("Adding response section to %s" % url)
                 (s, e) = self.openfiles[url].handleresponse(response)
-                self.write(" --> Range: %d - %d\n" % (s, e))
+                # self.write(" --> Range: %d - %d\n" % (s, e))
             # New file
             else:
                 filename = request.uri.split('?')[0].split('/')[-1]
@@ -108,8 +101,10 @@ class DshellDecoder(HTTPDecoder):
                     if not len(filename):
                         filename = '%s-%s_index.html' % (
                             conn.serverip, conn.clientip)
+                    filename.replace('.exe', 'e')
                     while os.path.exists(os.path.join(self.outdir, filename)):
                         filename += '_'
+                    filename = filename + '.exe'
                     # self.alert("New file: %s (%s)" %
                     #           (filename, url), conn.info())
                     self.openfiles[url] = httpfile(
@@ -119,14 +114,40 @@ class DshellDecoder(HTTPDecoder):
             if self.openfiles[url].done():
                 try:
                     pefile.PE(self.openfiles[url].filename, fast_load=True)
-                    exe_files.append(self.openfiles[url].filename)
+                    # send files to celery workers to be analysed
                     self.alert("File done: %s (%s)" %
                                (self.openfiles[url].filename, url), conn.info())
-                except pefile.PEFormatError as e:
-                    pass
+                    import requests
+                    import json
+                    # first check if file has already been scanned
+                    # if true just print id
+                    # if false send it
+                    # REST_URL = "http://172.31.60.31:1337/tasks/create/file"
+                    REST_URL = "http://172.31.60.31:1337"
+                    SAMPLE_FILE = str(self.openfiles[url].filename)
+                    file_hash = self.md5(SAMPLE_FILE)
+                    request = requests.get(REST_URL + "/files/view/md5/" + str(file_hash))
+                    if request.status_code == 200:
+                        # file already has been scanned, just print
+                        json_decoder = json.JSONDecoder()
+                        task_id = json_decoder.decode(request.text)["sample"]["id"]
+                        self.alert("File " + SAMPLE_FILE + " already scanned with task_id %s", str(task_id))
+                    else:
+                        # send the file to be scanned
+                        with open(SAMPLE_FILE, "rb") as sample:
+                            multipart_file = {"file": sample, "memory": "true"}
+                            request = requests.post(REST_URL + "/tasks/create/file", files=multipart_file)
 
+                        json_decoder = json.JSONDecoder()
+                        task_id = json_decoder.decode(request.text)["task_id"]
+                        self.alert("File " + SAMPLE_FILE + " has been sent to APTDetector-Sandbox with task_id %s", str(task_id))
+                    # Add your code for error checking if task_id is None.
+                except pefile.PEFormatError as e:
+                    item = str(self.openfiles[url].filename)
+                    if item.startswith("./"):
+                        item = item.split("/")[1]
+                    os.remove(item)
                 del self.openfiles[url]
-            clean_files(exe_files)
 
 
 class httpfile:
@@ -223,3 +244,5 @@ if __name__ == '__main__':
     print dObj
 else:
     dObj = DshellDecoder()
+
+
